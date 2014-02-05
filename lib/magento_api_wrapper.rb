@@ -1,8 +1,7 @@
+require 'savon'
+
 require 'magento_api_wrapper/connection'
 require 'magento_api_wrapper/savon_client'
-
-require 'magento_api_wrapper/api'
-require 'magento_api_wrapper/api_error'
 
 require 'magento_api_wrapper/request'
 require 'magento_api_wrapper/requests/add_tracking_to_shipment'
@@ -16,9 +15,11 @@ require 'magento_api_wrapper/requests/shipment_list'
 require 'magento_api_wrapper/requests/shipment_info'
 
 require 'magento_api_wrapper/response'
-require 'magento_api_wrapper/response_collection'
 require 'magento_api_wrapper/responses'
 require 'magento_api_wrapper/version'
+
+require 'magento_api_wrapper/api'
+require 'magento_api_wrapper/api_error'
 
 module MagentoApiWrapper
   class Error < StandardError; end

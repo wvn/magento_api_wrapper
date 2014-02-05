@@ -35,7 +35,7 @@ module MagentoApiWrapper
     end
 
     def log_env
-      true unless Rails.env.production?
+      true
     end
 
     def response_tag_format_lambda
