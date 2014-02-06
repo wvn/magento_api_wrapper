@@ -1,4 +1,6 @@
 module MagentoApiWrapper
+
+  #parses and returns the session_id returned from the call to login as a string
   class Login < MagentoApiWrapper::Response
     def initialize(response)
       super
@@ -41,6 +43,7 @@ module MagentoApiWrapper
     #end
   #end
 
+  #Returns an array of hashes, all the orders in the status passed in api.order_list
   class SalesOrderList < MagentoApiWrapper::Response
     def initialize(response)
       super
@@ -152,7 +155,7 @@ module MagentoApiWrapper
     def shipment_ids_array
       shipment_ids = []
       result.each do |item|
-        shipment_ids << shipment_id(item) if shipment_id(item).present?
+        shipment_ids << shipment_id(item) unless shipment_id(item).nil?
       end
       shipment_ids
     end

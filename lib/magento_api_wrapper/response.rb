@@ -3,6 +3,7 @@ module MagentoApiWrapper
 
     attr_accessor :document
 
+    #Creates a ruby hash from objects returned by Savon
     def initialize(response)
       @document = response.to_hash
     end

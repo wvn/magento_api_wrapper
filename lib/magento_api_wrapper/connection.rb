@@ -14,6 +14,8 @@ module MagentoApiWrapper
         @adapter || MagentoApiWrapper::SavonClient.new(request)
       end
 
+      #Receives both the request and the response back in order to give more complete error reporting when MagentoApiWrapper::ApiError is raised
+      #response is defined in MagentoApiWrapper::Response
       def raw_response(request, response)
         if error_present?(response.body)
           response_info = {request: request, response: response.body}
@@ -27,6 +29,12 @@ module MagentoApiWrapper
         response.keys[0] == :fault
       end
 
+      #Magento fault codes:
+      #0: Unknown Error
+      #1: Internal Error. Please see log for details.
+      #2: Access denied.
+      #3: Invalid api path.
+      #4: Resource path is not callable.
       def raise_magento_error(response)
         api_error = parse_error(response)
         case api_error.code(response)

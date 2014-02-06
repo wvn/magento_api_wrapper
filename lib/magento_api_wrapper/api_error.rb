@@ -34,6 +34,7 @@ module MagentoApiWrapper
       path.magento_url if path
     end
 
+    #MagentoApiWrapper::ApiError to_s gives you information about the response from Magento's API, like the HTTP status code and the Magento API message, but even if the response does not contain this information, you get information about the request to help diagnose the cause of the error.
     def to_s(response)
       "[Magento Fault Code: #{self.code(response)}] Error Message: #{self.message(response)} Received while attempting #{self.call(response)} for Magento URL: #{self.magento_url(response)}. Details: #{self.call_details(response)}"
     end
