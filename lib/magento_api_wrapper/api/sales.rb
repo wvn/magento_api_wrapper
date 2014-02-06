@@ -27,19 +27,28 @@ module MagentoApiWrapper
 
     #Notes on status_array
     #status_array should be an array of all statuses you want returned.
-    #Valid order statuses for Magento: "processing", "pending payment", "suspected fraud", "payment review", "pending", "on hold", "complete", "closed", "canceled", "pending paypal"
-    #Magento also allows custom statuses, so to get all orders DO NOT pass status_array. You will have to iterate through returned orders for statuses you want.
+    #Valid, standard order statuses for Magento SOAP API v2: "processing", "pending payment", "suspected fraud", "payment review", "pending", "on hold", "complete", "closed", "canceled", "pending paypal"
+    #Magento also allows custom statuses, so to get all orders DO NOT pass status_array. You will have to iterate through returned orders to discover list of custom statuses for individual installations of Magento.
+    #api.order_list(status_array: ['processing'])
+    #api.order_list(status_array: ['canceled', 'closed', 'on hold'])
 
     #Notes on last_modified
-    #You can pass a valid timestamp in any format and it will be parsed and formatted correctly. If a valid timestamp is not passed, fall back to default.
+    #You can pass a valid timestamp in any format and it will be parsed and formatted correctly. If a valid timestamp is not passed, but last_modified is not blank, fall back to default.
     #Required format for timestamps in Magento is to_formatted_s(:db)
-    #five_weeks_ago = (Time.now - 5.weeks).beginning_of_day.to_formatted_s(:db) )
-    #last_modified automatically set to two weeks ago if not set: (Time.now - 2.weeks).beginning_of_day.to_formatted_s(:db)
+    #five_weeks_ago = Time.now - 5.weeks
+    #api.order_list(last_modified: five_weeks_ago)
+    #api.order_list(last_modified: "02/01/2014")
 
     #Notes on created_at
+    #You can pass a valid timestamp in any format and it will be parsed and formatted correctly. If a valid timestamp is not passed, fall back to default.
+    #Required format for timestamps in Magento is to_formatted_s(:db)
+    #If no created_at_to is provided, today's date will be used
+    #Orders created between November 21, 2013 and January 31, 2014
+    #api.order_list(created_at_from: "11/21/2013", created_at_to: "1/31/2014")
 
     #TODO: Allow custom filters for all keys
-    #api.order_list(filters: {key: 'created_at', value: {"key" => "from", "value" =>(Time.now - 3.weeks).beginning_of_day.to_formatted_s(:db)}}
+    #Orders created between November 21, 2013 and January 31, 2014
+    #api.order_list(filters: {key: 'created_at', value: {"key" => "from", "value" => "11/21/2013" }, {"key" => "to", "value" => "1/31/2014"}})
     #[Magento filters: from http://bit.ly/N6dRD4]
     #The following is a list of valid complex_filter filter keys for Magento SOAP API v2. They are part of a complexObjectArray
     #-"from" returns rows that are after this value (datetime only)
@@ -97,6 +106,15 @@ module MagentoApiWrapper
       invoice = MagentoApiWrapper::CreateInvoice.new(request.connect!)
       invoice.successful?
       #invoice.successful? ? true : invoice_info(order_id: params[:order_id])
+    end
+
+    # api.invoice_list
+    def invoice_list(params = {})
+      params.merge!(session_params)
+      document = MagentoApiWrapper::Requests::InvoiceList.new(params)
+      request = MagentoApiWrapper::Request.new(magento_url: params[:magento_url], call_name: :sales_order_invoice_list)
+      request.body = document.body
+      MagentoApiWrapper::InvoiceList.new(request.connect!)
     end
 
     # api.invoice_info(order_id: "100000001")

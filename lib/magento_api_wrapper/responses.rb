@@ -103,6 +103,18 @@ module MagentoApiWrapper
     end
   end
 
+  class InvoiceList < MagentoApiWrapper::Response
+    def initialize(response)
+      super
+      result
+    end
+
+    def result
+      @document[:sales_order_invoice_list_response][:result][:item]
+    end
+
+  end
+
   class InvoiceInfo < MagentoApiWrapper::Response
     def initialize(response)
       super
