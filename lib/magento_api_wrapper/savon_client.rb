@@ -12,11 +12,14 @@ module MagentoApiWrapper
       client.call(@request.call_name, message: message_with_attributes, response_parser: :nokogiri)
     end
 
+    #message_with_attributes are required for some specific formatting when updating Magento via the SOAP API
     def message_with_attributes
-      @request.body.merge!(:attributes! => @request.attributes) if @request.attributes.present?
+      @request.body.merge!(:attributes! => @request.attributes) unless @request.attributes.empty?
       return @request.body
     end
 
+    #configuration of the client is mostly mandatory, however some of these options (like timeout) will be made configurable in the future
+    #TODO: make timeout configurable
     def client
       Savon::Client.new do |savon|
         savon.ssl_verify_mode          :none
@@ -34,10 +37,12 @@ module MagentoApiWrapper
       end
     end
 
+    #TODO: make configurable
     def log_env
       true
     end
 
+    #correctly format MagentoApiWrapper::Request call_names for SOAP v2
     def response_tag_format_lambda
       lambda { |key| key.snakecase.downcase }
     end
@@ -48,6 +53,7 @@ module MagentoApiWrapper
       }
     end
 
+    #Use MagentoApiWrapper::Api magento_url as endpoint
     def base_url
       "#{@magento_url}/api/v2_soap?wsdl=1"
     end
