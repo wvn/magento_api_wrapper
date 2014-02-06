@@ -1,5 +1,5 @@
 # coding: utf-8
-lib = File.expand_path('../lib/magento_api_wrapper', __FILE__)
+lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'magento_api_wrapper/version'
 
@@ -18,11 +18,12 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency("savon", "2.2.0")
+  spec.add_dependency "savon", "2.2.0"
 
   spec.add_development_dependency "bundler", "~> 1.3"
-  spec.add_development_dependency "rake", "~> 0.9.6", ">= 0.9.6"
-  spec.add_development_dependency "factory_girl", "~> 4.3.0", ">= 4.3.0"
-  spec.add_development_dependency "rspec", "~> 2.14", ">= 2.14.0"
-  spec.add_development_dependency "vcr", "~> 2.8.0", ">= 2.8.0"
+  spec.add_development_dependency "factory_girl", "~> 4.3.0"
+  spec.add_development_dependency "pry", "~> 0.9.12 "
+  spec.add_development_dependency "rake", "~> 0.9.6"
+  spec.add_development_dependency "rspec", "~> 2.14"
+  spec.add_development_dependency "vcr", "~> 2.8.0"
 end
