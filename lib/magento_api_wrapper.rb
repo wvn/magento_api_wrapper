@@ -21,6 +21,9 @@ require 'magento_api_wrapper/version'
 
 require 'magento_api_wrapper/api'
 require 'magento_api_wrapper/api/sales'
+require 'magento_api_wrapper/api/cart'
+require 'magento_api_wrapper/api/catalog'
+require 'magento_api_wrapper/api/customer'
 require 'magento_api_wrapper/api_error'
 
 module MagentoApiWrapper
