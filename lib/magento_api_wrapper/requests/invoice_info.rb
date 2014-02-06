@@ -9,7 +9,7 @@ module MagentoApiWrapper::Requests
 
     def body
       #TODO: Check this out
-      merge_filters(invoice_info_hash) if self.order_id.present?
+      merge_filters(invoice_info_hash) unless self.order_id.nil?
     end
 
     def invoice_info_hash

@@ -14,7 +14,7 @@ module MagentoApiWrapper::Requests
     def attributes
       {
         items_qty: {
-          "xsi:type" => "urn:orderItemIdQtyArray", 
+          "xsi:type" => "urn:orderItemIdQtyArray",
           "soapenc:arrayType" => "urn:orderItemIdQty[]"
         }
       }

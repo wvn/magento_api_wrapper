@@ -23,7 +23,7 @@ module MagentoApiWrapper::Requests
     end
 
     def order_id
-      data[:order_id]
+      data[:increment_id]
     end
 
 
