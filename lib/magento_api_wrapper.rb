@@ -1,4 +1,5 @@
 require 'savon'
+require 'active_support/core_ext'
 
 require 'magento_api_wrapper/connection'
 require 'magento_api_wrapper/savon_client'
@@ -19,6 +20,7 @@ require 'magento_api_wrapper/responses'
 require 'magento_api_wrapper/version'
 
 require 'magento_api_wrapper/api'
+require 'magento_api_wrapper/api/sales'
 require 'magento_api_wrapper/api_error'
 
 module MagentoApiWrapper
