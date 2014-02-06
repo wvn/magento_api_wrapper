@@ -80,95 +80,9 @@ module MagentoApiWrapper
       store.name
     end
 
-    #order = api.order_info(increment_id: "100000002")
-    #order.result (returns entire order)
-    #order.items (returns order line_items)
-    #order.shipping_address (returns order shipping address only)
-    #order.billing_address (returns order billing address only)
-    #order.payment_info (returns order payment information only)
-    def order_info(params = {})
-      params.merge!(common_params)
-      params.merge!(session_params) unless params[:session_id].present?
-      document = MagentoApiWrapper::Requests::SalesOrderInfo.new(params)
-      request = MagentoApiWrapper::Request.new(magento_url: params[:magento_url], call_name: :sales_order_info)
-      request.body = document.body
-      MagentoApiWrapper::SalesOrderInfo.new(request.connect!)
-    end
-
-    #items_array is the order line items ext_product_id and quantity
-    #api.create_invoice(order_id: "100000002", items_array: [{"order_item_id" => "27", "qty" => "4"}, {"order_item_id" => "45", "qty" => "1"}], comment: "Automatically Invoiced by ShippingEasy")
-    def create_invoice(params = {})
-      params.merge!(session_params)
-      document = MagentoApiWrapper::Requests::CreateInvoice.new(params)
-      request = MagentoApiWrapper::Request.new(magento_url: params[:magento_url], call_name: :sales_order_invoice_create)
-      request.body = document.body
-      request.attributes = document.attributes
-      invoice = MagentoApiWrapper::CreateInvoice.new(request.connect!)
-      invoice.successful?
-      #invoice.successful? ? true : invoice_info(order_id: params[:order_id])
-    end
-
-    # api.invoice_info(order_id: "100000001")
-    def invoice_info(params = {})
-      params.merge!(session_params)
-      document = MagentoApiWrapper::Requests::InvoiceInfo.new(params)
-      request = MagentoApiWrapper::Request.new(magento_url: params[:magento_url], call_name: :sales_order_invoice_info)
-      request.body = document.body
-      invoice = MagentoApiWrapper::InvoiceInfo.new(request.connect!)
-      invoice.invoice_id
-      #invoice.exists_for_order?
-    end
-
-    # api.create_shipment(order_id: "100000002")
-    def create_shipment(params = {})
-      params.merge!(session_params)
-      document = MagentoApiWrapper::Requests::CreateShipment.new(params)
-      request = MagentoApiWrapper::Request.new(magento_url: params[:magento_url], call_name: :sales_order_shipment_create)
-      request.body = document.body
-      new_shipment = MagentoApiWrapper::CreateShipment.new(request.connect!)
-      new_shipment.shipment_id
-      #new_shipment.successful? ? true : shipment_info(order_id: params[:order_id])
-    end
-
-    def shipment_list(params = {})
-      params.merge!(session_params)
-      document = MagentoApiWrapper::Requests::ShipmentList.new(params)
-      request = MagentoApiWrapper::Request.new(magento_url: params[:magento_url], call_name: :sales_order_shipment_list)
-      request.body = document.body
-      response = MagentoApiWrapper::ShipmentList.new(request.connect!)
-      response.shipment_ids_array
-    end
-
-    # api.shipment_info(order_id: "100000001")
-    def shipment_info(params = {})
-      params.merge!(session_params)
-      document = MagentoApiWrapper::Requests::ShipmentInfo.new(params)
-      request = MagentoApiWrapper::Request.new(magento_url: params[:magento_url], call_name: :sales_order_shipment_info)
-      request.body = document.body
-      shipment = MagentoApiWrapper::ShipmentInfo.new(request.connect!)
-      #shipment.shipment_id
-      shipment.exists_for_order?
-    end
-
-
-    #Magento carrier code options: 'ups', 'usps', 'dhl', 'fedex', or 'dhlint'
-    # api.add_tracking_number_to_shipment(increment_id: order_id, shipment_id: "100000001", tracking_number: "ABC123", carrier: "usps", title: "SE Shipment")
-    def add_tracking_to_shipment(params = {})
-      begin
-        shipment_id = params[:shipment_id] || create_shipment(params)
-        if shipment_id
-          params.merge!(session_params)
-          params.merge!(shipment_id: shipment_id)
-          document = MagentoApiWrapper::Requests::AddTrackingToShipment.new(params)
-          request = MagentoApiWrapper::Request.new(magento_url: params[:magento_url], call_name: :sales_order_shipment_add_track)
-          request.body = document.body
-          MagentoApiWrapper::AddTrackingToShipment.new(request.connect!)
-          true
-        end
-      rescue => e
-        raise e
-      end
-    end
+    #TODO: directoryCountryList
+    #TODO: directoryRegionList
+    #TODO: magentoInfo
 
   end
 end
