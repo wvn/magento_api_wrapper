@@ -78,6 +78,10 @@ module MagentoApiWrapper::Requests
       data[:created_at_key]
     end
 
+    def created_at
+
+    end
+
     def last_modified
       data[:last_modified]
     end
