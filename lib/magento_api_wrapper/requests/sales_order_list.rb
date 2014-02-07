@@ -32,6 +32,12 @@ module MagentoApiWrapper::Requests
       custom_filters.compare_by_identity
       if last_modified
         custom_filters["complexObjectArray"] = {
+          key: "updated_at",
+          value: last_modified_hash
+        }
+      end
+      if created_at_from
+        custom_filters["complexObjectArray"] = {
           key: "created_at",
           value: created_at_hash
         }
@@ -69,24 +75,50 @@ module MagentoApiWrapper::Requests
 
     def created_at_hash
       created_from = {}
+      created_from.compare_by_identity
       created_from["key"] = "from"
-      created_from["value"] = date_filter
+      created_from["value"] = created_at_from_filter
+      created_from["key"] = "to"
+      created_from["value"] = created_at_to_filter
       created_from
     end
 
-    def created_at_key
-      data[:created_at_key]
+    def created_at_from
+      data[:created_at_from]
     end
 
-    def created_at
+    def created_at_to
+      data[:created_at_to]
+    end
 
+    def last_modified_hash
+      last_modified = {}
+      last_modified["key"] = "from"
+      last_modified["value"] = last_modified_filter
+      last_modified
     end
 
     def last_modified
       data[:last_modified]
     end
 
-    def date_filter
+    def created_at_from_filter
+      begin
+        Time.parse(created_at_from).beginning_of_day.to_formatted_s(:db)
+      rescue MagentoApiWrapper::BadRequest => e
+        raise e
+      end
+    end
+
+    def created_at_to_filter
+      if created_at_to
+        Time.parse(created_at_to).beginning_of_day.to_formatted_s(:db)
+      else
+        Time.now.beginning_of_day.to_formatted_s(:db)
+      end
+    end
+
+    def last_modified_filter
       begin
         Time.parse(last_modified).beginning_of_day.to_formatted_s(:db)
       rescue MagentoApiWrapper::BadRequest => e

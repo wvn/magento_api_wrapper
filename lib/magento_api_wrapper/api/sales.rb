@@ -32,7 +32,7 @@ module MagentoApiWrapper
     #api.order_list(status_array: ['processing'])
     #api.order_list(status_array: ['canceled', 'closed', 'on hold'])
 
-    #Notes on last_modified
+    #Notes on last_modified (in magento 'updated_at')
     #You can pass a valid timestamp in any format and it will be parsed and formatted correctly. If a valid timestamp is not passed, but last_modified is not blank, fall back to default.
     #Required format for timestamps in Magento is to_formatted_s(:db)
     #five_weeks_ago = Time.now - 5.weeks
