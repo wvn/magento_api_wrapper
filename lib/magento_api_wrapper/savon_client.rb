@@ -15,6 +15,7 @@ module MagentoApiWrapper
     #message_with_attributes are required for some specific formatting when updating Magento via the SOAP API
     def message_with_attributes
       @request.body.merge!(:attributes! => @request.attributes) unless @request.attributes.empty?
+      puts "REQUEST: #{@request.inspect}"
       return @request.body
     end
 
@@ -25,7 +26,7 @@ module MagentoApiWrapper
         savon.ssl_verify_mode          :none
         savon.wsdl                     base_url
         savon.namespaces               namespaces
-        savon.env_namespace            :soapenv
+        savon.env_namespace            'SOAP-ENV'
         savon.raise_errors             false
         #savon.namespace_identifier     #none
         savon.convert_request_keys_to  :lower_camelcase
@@ -49,7 +50,12 @@ module MagentoApiWrapper
 
     def namespaces
       {
-        'xmlns:soapenv' => 'http://schemas.xmlsoap.org/soap/envelope/'
+        'xmlns:SOAP-ENV' => 'http://schemas.xmlsoap.org/soap/envelope/',
+        'xmlns:ns1' => 'urn:Magento',
+        'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema',
+        'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
+        'xmlns:SOAP-ENC' => 'http://schemas.xmlsoap.org/soap/encoding/',
+        'SOAP-ENV:encodingStyle' => 'http://schemas.xmlsoap.org/soap/encoding/'
       }
     end
 

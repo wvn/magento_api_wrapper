@@ -1,5 +1,4 @@
 require 'savon'
-require 'active_support/core_ext'
 
 require 'magento_api_wrapper/connection'
 require 'magento_api_wrapper/savon_client'
