@@ -11,6 +11,12 @@ module MagentoApiWrapper::Requests
       merge_filters!(sales_order_list_hash)
     end
 
+    def attributes
+      { session_id: { "xsi:type" => "xsd:string" },
+        filters: { "xsi:type" => "ns1:filters" },
+      }
+    end
+
     def sales_order_list_hash
       {
         session_id: self.session_id
@@ -18,9 +24,15 @@ module MagentoApiWrapper::Requests
     end
 
     def merge_filters!(sales_order_list_hash)
-      sales_order_list_filters = {}
       if !filters_array.empty?
-        sales_order_list_filters["complex_filter"] = filters_array
+        sales_order_list_filters = {
+          filters: filters_array,
+          :attributes! => {
+            filter: {
+              "SOAP-ENC:arrayType" => "ns1:associativeEntity[2]",
+              "xsi:type" => "ns1:associativeArray" },
+          }
+        }
         sales_order_list_hash.merge!(sales_order_list_filters)
       else
         sales_order_list_hash
@@ -31,26 +43,46 @@ module MagentoApiWrapper::Requests
       custom_filters = {}
       custom_filters.compare_by_identity
       if last_modified
-        custom_filters["complexObjectArray"] = {
+        custom_filters["filter"] = {
+          item: {
           key: "updated_at",
           value: last_modified_hash
+          }
         }
       end
       if created_at_from
-        custom_filters["complexObjectArray"] = {
-          key: "created_at",
-          value: created_at_hash
+        custom_filters["filter"] = {
+          item: {
+            key: "created_at",
+            value: created_at_hash,
+            :attributes! => {
+              key: { "xsi:type" => "xsd:string" },
+              value: { "xsi:type" => "xsd:string" }
+            }
+          },
+          :attributes! => {
+            item: { "xsi:type" => "ns1:associativeEntity" },
+          },
         }
       end
       if status_array
-        custom_filters["complexObjectArray"] = {
-          key: "state",
-          value: status_hash
+        custom_filters["filter"] = {
+          item: {
+            key: "status",
+            value: status_array.first,
+            :attributes! => {
+              key: { "xsi:type" => "xsd:string" },
+              value: { "xsi:type" => "xsd:string" }
+            }
+          },
+          :attributes! => {
+            item: { "xsi:type" => "ns1:associativeEntity" },
+          },
         }
       end
       if filters
         filters.each do |key, value_hash|
-          custom_filters["complexObjectArray"] = {
+          custom_filters["filter"] = {
             key: key,
             value: value_hash
           }
@@ -62,7 +94,8 @@ module MagentoApiWrapper::Requests
     def status_hash
       status = {}
       status.compare_by_identity
-      status["key"] = "in"
+      status["key"] = "eq"
+      #status["key"] = "status"
       status_array.each do |o_status|
         status["value"] = o_status
       end
@@ -104,7 +137,7 @@ module MagentoApiWrapper::Requests
 
     def created_at_from_filter
       begin
-        Time.parse(created_at_from).beginning_of_day.to_formatted_s(:db)
+        Time.parse(created_at_from).strftime("%Y-%m-%d %H:%M:%S")
       rescue MagentoApiWrapper::BadRequest => e
         raise e
       end
@@ -112,15 +145,15 @@ module MagentoApiWrapper::Requests
 
     def created_at_to_filter
       if created_at_to
-        Time.parse(created_at_to).beginning_of_day.to_formatted_s(:db)
+        Time.parse(created_at_to).strftime("%Y-%m-%d %H:%M:%S")
       else
-        Time.now.beginning_of_day.to_formatted_s(:db)
+        Time.now.strftime("%Y-%m-%d %H:%M:%S")
       end
     end
 
     def last_modified_filter
       begin
-        Time.parse(last_modified).beginning_of_day.to_formatted_s(:db)
+        Time.parse(last_modified).strftime("%Y-%m-%d %H:%M:%S")
       rescue MagentoApiWrapper::BadRequest => e
         raise e
       end

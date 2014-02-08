@@ -27,7 +27,7 @@ module MagentoApiWrapper
 
     #Notes on status_array
     #status_array should be an array of all statuses you want returned.
-    #Valid, standard order statuses for Magento SOAP API v2: "processing", "pending payment", "suspected fraud", "payment review", "pending", "on hold", "complete", "closed", "canceled", "pending paypal"
+    #Valid, standard order statuses for Magento SOAP API v2:'pending','pending_payment','processing','holded','complete','closed','canceled','fraud'
     #Magento also allows custom statuses, so to get all orders DO NOT pass status_array. You will have to iterate through returned orders to discover list of custom statuses for individual installations of Magento.
     #api.order_list(status_array: ['processing'])
     #api.order_list(status_array: ['canceled', 'closed', 'on hold'])
@@ -44,7 +44,7 @@ module MagentoApiWrapper
     #Required format for timestamps in Magento is to_formatted_s(:db)
     #If no created_at_to is provided, today's date will be used
     #Orders created between November 21, 2013 and January 31, 2014
-    #api.order_list(created_at_from: "11/21/2013", created_at_to: "1/31/2014")
+    #api.order_list(created_at_from: "2013-11-21", created_at_to: "2013-12-01")
 
     #TODO: Allow custom filters for all keys
     #Orders created between November 21, 2013 and January 31, 2014
@@ -76,6 +76,7 @@ module MagentoApiWrapper
       document = MagentoApiWrapper::Requests::SalesOrderList.new(params)
       request = MagentoApiWrapper::Request.new(magento_url: params[:magento_url], call_name: :sales_order_list)
       request.body = document.body
+      request.attributes = document.attributes
       orders = MagentoApiWrapper::SalesOrderList.new(request.connect!)
       orders.collection
     end
