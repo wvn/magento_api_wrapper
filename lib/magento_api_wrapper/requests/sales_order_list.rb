@@ -27,11 +27,6 @@ module MagentoApiWrapper::Requests
       if !filters_array.empty?
         sales_order_list_filters = {
           filters: filters_array,
-          :attributes! => {
-            filter: {
-              "SOAP-ENC:arrayType" => "ns1:associativeEntity[2]",
-              "xsi:type" => "ns1:associativeArray" },
-          }
         }
         sales_order_list_hash.merge!(sales_order_list_filters)
       else
@@ -43,14 +38,31 @@ module MagentoApiWrapper::Requests
       custom_filters = {}
       custom_filters.compare_by_identity
       if last_modified
+        custom_filters[:attributes!] = {
+          "filter" => {
+            "SOAP-ENC:arrayType" => "ns1:associativeEntity[2]",
+            "xsi:type" => "ns1:associativeArray" },
+        }
         custom_filters["filter"] = {
           item: {
-          key: "updated_at",
-          value: last_modified_hash
-          }
+            key: "updated_at",
+            value: last_modified_hash,
+            :attributes! => {
+              key: { "xsi:type" => "xsd:string" },
+              value: { "xsi:type" => "xsd:string" }
+            }
+          },
+          :attributes! => {
+            item: { "xsi:type" => "ns1:associativeEntity" },
+          },
         }
       end
       if created_at_from
+        custom_filters[:attributes!] = {
+          "filter" => {
+            "SOAP-ENC:arrayType" => "ns1:associativeEntity[2]",
+            "xsi:type" => "ns1:associativeArray" },
+        }
         custom_filters["filter"] = {
           item: {
             key: "created_at",
@@ -66,6 +78,11 @@ module MagentoApiWrapper::Requests
         }
       end
       if status_array
+        custom_filters[:attributes!] = {
+          "filter" => {
+            "SOAP-ENC:arrayType" => "ns1:associativeEntity[2]",
+            "xsi:type" => "ns1:associativeArray" },
+        }
         custom_filters["filter"] = {
           item: {
             key: "status",
@@ -83,6 +100,11 @@ module MagentoApiWrapper::Requests
       if filters
         filters.each do |key, value_hash|
           custom_filters["filter"] = {
+          :attributes! => {
+            "filter" => {
+              "SOAP-ENC:arrayType" => "ns1:associativeEntity[2]",
+              "xsi:type" => "ns1:associativeArray" },
+          },
             key: key,
             value: value_hash
           }
