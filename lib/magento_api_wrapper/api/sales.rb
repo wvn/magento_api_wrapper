@@ -25,30 +25,20 @@ module MagentoApiWrapper
       super
     end
 
-    #Notes on status_array
-    #status_array should be an array of all statuses you want returned.
-    #Valid, standard order statuses for Magento SOAP API v2:'pending','pending_payment','processing','holded','complete','closed','canceled','fraud'
-    #Magento also allows custom statuses, so to get all orders DO NOT pass status_array. You will have to iterate through returned orders to discover list of custom statuses for individual installations of Magento.
-    #api.order_list(status_array: ['processing'])
-    #api.order_list(status_array: ['canceled', 'closed', 'on hold'])
+    #Valid, standard order statuses for Magento SOAP API v2:
+    #-'pending'
+    #-'pending_payment'
+    #-'processing'
+    #-'holded'
+    #-'complete'
+    #-'closed'
+    #-'canceled'
+    #-'fraud'
+    #Magento also allows custom statuses, so to get all orders DO NOT pass a status. You will have to iterate through returned orders to discover list of custom statuses for individual installations of Magento.
 
-    #Notes on last_modified (in magento 'updated_at')
-    #You can pass a valid timestamp in any format and it will be parsed and formatted correctly. If a valid timestamp is not passed, but last_modified is not blank, fall back to default.
-    #Required format for timestamps in Magento is to_formatted_s(:db)
-    #five_weeks_ago = Time.now - 5.weeks
-    #api.order_list(last_modified: five_weeks_ago)
-    #api.order_list(last_modified: "02/01/2014")
+    #You CANNOT pass multiple filters for the same key. The example below will NOT work unfortunately. For example, if you are attempting to get orders created between November 21, 2013 and January 31, 2014, you cannot pass the code below, only the first filter will be acknowledged by Magento:
+    #api.order_list(complex_filters: [{key: 'created_at', operator: "from", value: "11/21/2013" }, {key: "created_at", operator: "to", value: "1/31/2014"}])
 
-    #Notes on created_at
-    #You can pass a valid timestamp in any format and it will be parsed and formatted correctly. If a valid timestamp is not passed, fall back to default.
-    #Required format for timestamps in Magento is to_formatted_s(:db)
-    #If no created_at_to is provided, today's date will be used
-    #Orders created between November 21, 2013 and January 31, 2014
-    #api.order_list(created_at_from: "2013-11-21", created_at_to: "2013-12-01")
-
-    #TODO: Allow custom filters for all keys
-    #Orders created between November 21, 2013 and January 31, 2014
-    #api.order_list(filters: {key: 'created_at', value: {"key" => "from", "value" => "11/21/2013" }, {"key" => "to", "value" => "1/31/2014"}})
     #[Magento filters: from http://bit.ly/N6dRD4]
     #The following is a list of valid complex_filter filter keys for Magento SOAP API v2. They are part of a complexObjectArray
     #-"from" returns rows that are after this value (datetime only)
@@ -57,7 +47,7 @@ module MagentoApiWrapper
     #-"neq" returns rows not equal to this value
     #-"like" returns rows that match this value (with % as a wildcard)
     #-"nlike" returns rows that do not match this value (with % as a wildcard)
-    #-"i rows where the value is in this array (pass an array in)
+    #-"in" rows where the value is in this array (pass an array in)
     #-"nin" returns rows where the value is not in this array (pass an array in)
     #-"is" use interchangeably with eq
     #-"null" returns rows that are null
@@ -69,8 +59,9 @@ module MagentoApiWrapper
     #-"moreq" unsure
     #-"finset" unsure
 
-    #Returns an array of hashes with orders
-    #api.order_list(status_array: ['pending', 'processing'], last_modified: five_weeks_ago)
+    #api.order_list(simple_filters: [{key: "status" value: "processing"}])
+    #api.order_list(simple_filters: [{key: "status", value: "processing"}, {key: created_at, value: "12/10/2013" }])
+    #api.order_list(complex_filters: [{key: "status", value: ["processing", "completed"]}, {key: created_at, value: "12/10/2013" }])
     def order_list(params = {})
       params.merge!(session_params)
       document = MagentoApiWrapper::Requests::SalesOrderList.new(params)
