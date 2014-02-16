@@ -37,105 +37,79 @@ module MagentoApiWrapper::Requests
     def filters_array
       custom_filters = {}
       custom_filters.compare_by_identity
-      if last_modified
-        custom_filters[:attributes!] = {
-          "filter" => {
-            "SOAP-ENC:arrayType" => "ns1:associativeEntity[2]",
-            "xsi:type" => "ns1:associativeArray" },
-        }
-        custom_filters["filter"] = {
-          item: {
-            key: "updated_at",
-            value: last_modified_hash,
-            :attributes! => {
-              key: { "xsi:type" => "xsd:string" },
-              value: { "xsi:type" => "xsd:string" }
-            }
-          },
-          :attributes! => {
-            item: { "xsi:type" => "ns1:associativeEntity" },
-          },
-        }
+      if !simple_filters.nil?
+        add_simple_filters(custom_filters)
       end
-      if created_at_from
-        custom_filters[:attributes!] = {
-          "filter" => {
-            "SOAP-ENC:arrayType" => "ns1:associativeEntity[2]",
-            "xsi:type" => "ns1:associativeArray" },
-        }
-        custom_filters["filter"] = {
-          item: {
-            key: "created_at",
-            value: created_at_hash,
-            :attributes! => {
-              key: { "xsi:type" => "xsd:string" },
-              value: { "xsi:type" => "xsd:string" }
-            }
-          },
-          :attributes! => {
-            item: { "xsi:type" => "ns1:associativeEntity" },
-          },
-        }
-      end
-      if status_array
-        custom_filters[:attributes!] = {
-          "filter" => {
-            "SOAP-ENC:arrayType" => "ns1:associativeEntity[2]",
-            "xsi:type" => "ns1:associativeArray" },
-        }
-        custom_filters["filter"] = {
-          item: {
-            key: "status",
-            value: status_array.first,
-            :attributes! => {
-              key: { "xsi:type" => "xsd:string" },
-              value: { "xsi:type" => "xsd:string" }
-            }
-          },
-          :attributes! => {
-            item: { "xsi:type" => "ns1:associativeEntity" },
-          },
-        }
-      end
-      if filters
-        filters.each do |key, value_hash|
-          custom_filters["filter"] = {
-          :attributes! => {
-            "filter" => {
-              "SOAP-ENC:arrayType" => "ns1:associativeEntity[2]",
-              "xsi:type" => "ns1:associativeArray" },
-          },
-            key: key,
-            value: value_hash
-          }
-        end
+
+      if !complex_filters.nil?
+        add_complex_filters(custom_filters)
       end
       custom_filters
     end
 
-    def status_hash
-      status = {}
-      status.compare_by_identity
-      status["key"] = "eq"
-      #status["key"] = "status"
-      status_array.each do |o_status|
-        status["value"] = o_status
+    def add_simple_filters(custom_filters)
+      simple_filters.each do |sfilter|
+        custom_filters[:attributes!] = {
+          "filter" => {
+            "SOAP-ENC:arrayType" => "ns1:associativeEntity[2]",
+            "xsi:type" => "ns1:associativeArray"
+          }
+        }
+        custom_filters["filter"] = {
+          item: {
+            key: sfilter[:key],
+            value: sfilter[:value],  #formatted_timestamp(created_at)
+            :attributes! => {
+              key: { "xsi:type" => "xsd:string" },
+              value: { "xsi:type" => "xsd:string" }
+            },
+          },
+          :attributes! => {
+            item: { "xsi:type" => "ns1:associativeEntity" },
+          },
+        }
       end
-      status
+      custom_filters
+    end
+
+    def add_complex_filters(custom_filters)
+      complex_filters.each do |cfilter|
+        custom_filters[:attributes!] = {
+          "complex_filter" => {
+            "SOAP-ENC:arrayType" => "ns1:complexFilter[2]",
+            "xsi:type" => "ns1:complexFilterArray"
+          }
+        }
+        custom_filters["complex_filter"] = {
+          item: {
+            key: cfilter[:key],
+            value: {
+              key: cfilter[:operator],
+              value: cfilter[:value]
+            },
+            :attributes! => {
+              key: { "xsi:type" => "xsd:string" },
+              value: { "xsi:type" => "xsd:associativeEntity" }
+            },
+          },
+          :attributes! => {
+            item: { "xsi:type" => "ns1:complexFilter" },
+          },
+        }
+      end
+      custom_filters
+    end
+
+    def formatted_timestamp(timestamp)
+      begin
+        Time.parse(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+      rescue MagentoApiWrapper::BadRequest => e
+        raise "Did you pass date in format YYYY-MM-DD? Error: #{e}"
+      end
     end
 
     def status_array
       data[:status_array]
-    end
-
-    def created_at_hash
-      created_from = {}
-      created_from.compare_by_identity
-      created_from["key"] = "from"
-      created_from["value"] = created_at_from_filter
-      created_from["key"] = "to"
-      created_from["value"] = created_at_to_filter
-      created_from
     end
 
     def created_at_from
@@ -146,48 +120,20 @@ module MagentoApiWrapper::Requests
       data[:created_at_to]
     end
 
-    def last_modified_hash
-      last_modified = {}
-      last_modified["key"] = "from"
-      last_modified["value"] = last_modified_filter
-      last_modified
-    end
-
     def last_modified
       data[:last_modified]
-    end
-
-    def created_at_from_filter
-      begin
-        Time.parse(created_at_from).strftime("%Y-%m-%d %H:%M:%S")
-      rescue MagentoApiWrapper::BadRequest => e
-        raise e
-      end
-    end
-
-    def created_at_to_filter
-      if created_at_to
-        Time.parse(created_at_to).strftime("%Y-%m-%d %H:%M:%S")
-      else
-        Time.now.strftime("%Y-%m-%d %H:%M:%S")
-      end
-    end
-
-    def last_modified_filter
-      begin
-        Time.parse(last_modified).strftime("%Y-%m-%d %H:%M:%S")
-      rescue MagentoApiWrapper::BadRequest => e
-        raise e
-      end
     end
 
     def session_id
       data[:session_id]
     end
 
-    def filters
-      data[:filters]
+    def simple_filters
+      data[:simple_filters]
     end
 
+    def complex_filters
+      data[:complex_filters]
+    end
   end
 end
