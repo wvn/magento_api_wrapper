@@ -171,5 +171,28 @@ module MagentoApiWrapper
       end
     end
 
+    def add_comment_to_order(params = {})
+      begin
+        order_increment_id = params[:order_increment_id]
+        comment = params[:comment]
+        status = params[:status]
+
+        if order_increment_id
+          params.merge!(session_params)
+          params.merge!(order_increment_id: order_increment_id)
+          params.merge!(comment: comment)
+          params.merge!(status: status)
+          document = MagentoApiWrapper::Requests::AddCommentToOrder.new(params)
+          request = MagentoApiWrapper::Request.new(magento_url: params[:magento_url], call_name: :sales_order_add_comment)
+          request.body = document.body
+          MagentoApiWrapper::AddCommentToOrder.new(request.connect!)
+          true
+        end
+
+      rescue => e
+        raise e
+      end
+    end
+
   end
 end
