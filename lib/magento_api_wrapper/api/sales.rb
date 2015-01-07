@@ -80,7 +80,7 @@ module MagentoApiWrapper
     #order.payment_info (returns order payment information only)
     def order_info(params = {})
       params.merge!(common_params)
-      params.merge!(session_params) unless params[:session_id].present?
+      params.merge!(session_params) unless ! params[:session_id].nil? and params[:session_id].present?
       document = MagentoApiWrapper::Requests::SalesOrderInfo.new(params)
       request = MagentoApiWrapper::Request.new(magento_url: params[:magento_url], call_name: :sales_order_info)
       request.body = document.body
