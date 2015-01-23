@@ -14,6 +14,7 @@ require 'magento_api_wrapper/requests/create_shipment'
 require 'magento_api_wrapper/requests/shipment_list'
 require 'magento_api_wrapper/requests/shipment_info'
 require 'magento_api_wrapper/requests/add_tracking_to_shipment'
+require 'magento_api_wrapper/requests/add_comment_to_order'
 
 require 'magento_api_wrapper/response'
 require 'magento_api_wrapper/responses'

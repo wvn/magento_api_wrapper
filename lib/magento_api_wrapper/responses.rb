@@ -205,4 +205,18 @@ module MagentoApiWrapper
       #true or false
     end
   end
+
+  class AddCommentToOrder < MagentoApiWrapper::Response
+    def initialize(response)
+      super
+    end
+
+    def result
+      @document[:sales_order_add_comment_response][:result]
+    end
+
+    def success?
+      #true or false
+    end
+  end
 end
